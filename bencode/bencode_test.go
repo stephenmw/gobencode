@@ -26,12 +26,12 @@ func TestEncoder(t *testing.T) {
 
 		err := e.Encode(test.v)
 		if err != nil {
-			t.Errorf("Error on encode test %d. Returned error `%s`.", i, err.Error())
+			t.Errorf("Test %d: returned error `%s`.", i, err.Error())
 		}
 		ret := buf.String()
 
 		if ret != test.ret {
-			t.Errorf("Error on encode test %d. Expected `%s`, got `%s`.", i, test.ret, ret)
+			t.Errorf("Test %d: expected `%s`, got `%s`.", i, test.ret, ret)
 		}
 	}
 }
