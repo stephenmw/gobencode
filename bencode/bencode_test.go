@@ -16,6 +16,7 @@ var encTests = []encoderTest{
 	{-10, "i-10e"},
 	{"test", "4:test"},
 	{[]byte{'a', 'b', 'c'}, "3:abc"},
+	{[]int{1,2,3}, "li1ei2ei3ee"},
 }
 
 func TestEncoder(t *testing.T) {

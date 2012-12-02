@@ -45,6 +45,15 @@ func (e *Encoder) Encode(v interface{}) error {
 	}
 
 	// complex types
+	switch value.Type().Kind() {
+	case reflect.Slice:
+		e.w.Write([]byte{'l'})
+		for i := 0; i < value.Len(); i++ {
+			e.Encode(value.Index(i).Interface())
+		}
+		e.w.Write([]byte{'e'})
+		return nil
+	}
 
 	return errors.New(fmt.Sprintf("Unsupported type %T", v))
 }
