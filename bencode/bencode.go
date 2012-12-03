@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"reflect"
+	"sort"
 )
 
 // An Encoder writes bencoded data to an output stream.
@@ -67,17 +68,36 @@ func (e *Encoder) encodeSlice(v reflect.Value) error {
 	return nil
 }
 
+type keyValue struct {
+	key string
+	value interface{}
+}
+
+type keyValueSlice []keyValue
+
+func (p keyValueSlice) Len() int           { return len(p) }
+func (p keyValueSlice) Less(i, j int) bool { return p[i].key < p[j].key }
+func (p keyValueSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+
 func (e *Encoder) encodeStruct(v reflect.Value) error {
 	e.w.Write([]byte{'d'})
 	t := v.Type()
+	var keyVals []keyValue
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		if field.PkgPath != "" {
-			continue    // field is not exported
+		if field.PkgPath == "" {   // field is exported
+			keyVals = append(keyVals, keyValue{field.Name, v.Field(i).Interface()})
 		}
-		e.Encode(field.Name)
-		e.Encode(v.Field(i).Interface())
 	}
+
+	sort.Sort(keyValueSlice(keyVals))
+
+	for _, kv := range keyVals {
+		e.Encode(kv.key)
+		e.Encode(kv.value)
+	}
+
 	e.w.Write([]byte{'e'})
 
 	return nil
