@@ -16,10 +16,19 @@ var encTests = []encoderTest{
 	{-10, "i-10e"},
 	{"test", "4:test"},
 	{[]byte{'a', 'b', 'c'}, "3:abc"},
-	{[]int{1,2,3}, "li1ei2ei3ee"},
-	{struct{X, Y int; Z string}{1,2, "hello"}, "d1:Xi1e1:Yi2e1:Z5:helloe"},
-	{struct{Z string; X, Y int}{"hello", 1, 2}, "d1:Xi1e1:Yi2e1:Z5:helloe"},
-	{struct{X, Y int; z string}{1,2, "hello"}, "d1:Xi1e1:Yi2ee"},
+	{[]int{1, 2, 3}, "li1ei2ei3ee"},
+	{struct {
+		X, Y int
+		Z    string
+	}{1, 2, "hello"}, "d1:Xi1e1:Yi2e1:Z5:helloe"},
+	{struct {
+		Z    string
+		X, Y int
+	}{"hello", 1, 2}, "d1:Xi1e1:Yi2e1:Z5:helloe"},
+	{struct {
+		X, Y int
+		z    string
+	}{1, 2, "hello"}, "d1:Xi1e1:Yi2ee"},
 }
 
 func TestEncoder(t *testing.T) {

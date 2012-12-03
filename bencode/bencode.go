@@ -69,7 +69,7 @@ func (e *Encoder) encodeSlice(v reflect.Value) error {
 }
 
 type keyValue struct {
-	key string
+	key   string
 	value interface{}
 }
 
@@ -79,14 +79,13 @@ func (p keyValueSlice) Len() int           { return len(p) }
 func (p keyValueSlice) Less(i, j int) bool { return p[i].key < p[j].key }
 func (p keyValueSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
-
 func (e *Encoder) encodeStruct(v reflect.Value) error {
 	e.w.Write([]byte{'d'})
 	t := v.Type()
 	var keyVals []keyValue
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
-		if field.PkgPath == "" {   // field is exported
+		if field.PkgPath == "" { // field is exported
 			keyVals = append(keyVals, keyValue{field.Name, v.Field(i).Interface()})
 		}
 	}
