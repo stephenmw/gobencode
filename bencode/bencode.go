@@ -47,13 +47,38 @@ func (e *Encoder) Encode(v interface{}) error {
 	// complex types
 	switch value.Type().Kind() {
 	case reflect.Slice:
-		e.w.Write([]byte{'l'})
-		for i := 0; i < value.Len(); i++ {
-			e.Encode(value.Index(i).Interface())
-		}
-		e.w.Write([]byte{'e'})
+		e.encodeSlice(value)
+		return nil
+	case reflect.Struct:
+		e.encodeStruct(value)
 		return nil
 	}
 
 	return errors.New(fmt.Sprintf("Unsupported type %T", v))
+}
+
+func (e *Encoder) encodeSlice(v reflect.Value) error {
+	e.w.Write([]byte{'l'})
+	for i := 0; i < v.Len(); i++ {
+		e.Encode(v.Index(i).Interface())
+	}
+	e.w.Write([]byte{'e'})
+
+	return nil
+}
+
+func (e *Encoder) encodeStruct(v reflect.Value) error {
+	e.w.Write([]byte{'d'})
+	t := v.Type()
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		if field.PkgPath != "" {
+			continue    // field is not exported
+		}
+		e.Encode(field.Name)
+		e.Encode(v.Field(i).Interface())
+	}
+	e.w.Write([]byte{'e'})
+
+	return nil
 }
