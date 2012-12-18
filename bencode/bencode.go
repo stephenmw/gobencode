@@ -8,7 +8,10 @@ import (
 	"io"
 	"reflect"
 	"sort"
+	"strings"
 )
+
+const packageName = "bencode"
 
 // An Encoder writes bencoded data to an output stream.
 type Encoder struct {
@@ -86,7 +89,15 @@ func (e *Encoder) encodeStruct(v reflect.Value) error {
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		if field.PkgPath == "" { // field is exported
-			keyVals = append(keyVals, keyValue{field.Name, v.Field(i).Interface()})
+			tag := field.Tag.Get(packageName)
+			tagPart := strings.SplitAfter(tag, ",")
+
+			key, value := field.Name, v.Field(i).Interface()
+			if tagPart[0] != "" {
+				key = tagPart[0]
+			}
+
+			keyVals = append(keyVals, keyValue{key, value})
 		}
 	}
 
