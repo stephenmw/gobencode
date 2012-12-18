@@ -51,11 +51,11 @@ func (e *Encoder) Encode(v interface{}) error {
 	// complex types
 	switch value.Type().Kind() {
 	case reflect.Slice:
-		e.encodeSlice(value)
-		return nil
+		return e.encodeSlice(value)
 	case reflect.Struct:
-		e.encodeStruct(value)
-		return nil
+		return e.encodeStruct(value)
+	case reflect.Map:
+		return e.encodeMap(value)
 	}
 
 	return errors.New(fmt.Sprintf("Unsupported type %T", v))
@@ -83,9 +83,9 @@ func (p keyValueSlice) Less(i, j int) bool { return p[i].key < p[j].key }
 func (p keyValueSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 
 func (e *Encoder) encodeStruct(v reflect.Value) error {
-	e.w.Write([]byte{'d'})
-	t := v.Type()
 	var keyVals []keyValue
+
+	t := v.Type()
 	for i := 0; i < t.NumField(); i++ {
 		field := t.Field(i)
 		if field.PkgPath == "" { // field is exported
@@ -101,7 +101,23 @@ func (e *Encoder) encodeStruct(v reflect.Value) error {
 		}
 	}
 
+	return e.writeDictionary(keyVals)
+}
+
+func (e *Encoder) encodeMap(v reflect.Value) error {
+	var keyVals []keyValue
+
+	for _, k := range v.MapKeys() {
+		keyVals = append(keyVals, keyValue{k.String(), v.MapIndex(k).Interface()})
+	}
+
+	return e.writeDictionary(keyVals)
+}
+
+func (e *Encoder) writeDictionary(keyVals []keyValue) error {
 	sort.Sort(keyValueSlice(keyVals))
+
+	e.w.Write([]byte{'d'})
 
 	for _, kv := range keyVals {
 		e.Encode(kv.key)

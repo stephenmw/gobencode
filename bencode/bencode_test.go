@@ -21,7 +21,7 @@ var encTests = []encoderTest{
 	// lists
 	{[]int{1, 2, 3}, "li1ei2ei3ee"},
 
-	// dictionarys
+	// struct dictionaries
 	{struct {
 		X, Y int
 		Z    string
@@ -41,6 +41,10 @@ var encTests = []encoderTest{
 		X int `bencode:"x"`
 		Z int `bencode:"a"` // Z (as key 'a') should be first
 	}{1, 2}, "d1:ai2e1:xi1ee"},
+
+	// map dictionaries
+	{map[string]string{"a": "b"}, "d1:a1:be"},
+	{map[string]string{"a": "b", "x": "y", "i": "j"}, "d1:a1:b1:i1:j1:x1:ye"},
 }
 
 func TestEncoder(t *testing.T) {
