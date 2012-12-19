@@ -1,5 +1,4 @@
-// Encodes and decodes bencode format.
-// TODO: fix errors
+// Encodes bencode format.
 package bencode
 
 import (
@@ -69,10 +68,9 @@ func (e *Encoder) encodeSlice(v reflect.Value) error {
 	for i := 0; i < v.Len(); i++ {
 		if err := e.Encode(v.Index(i).Interface()); err != nil {
 			return err
-		}		
+		}
 	}
 
-	
 	if _, err := e.w.Write([]byte{'e'}); err != nil {
 		return err
 	}
@@ -134,7 +132,7 @@ func (e *Encoder) writeDictionary(keyVals []keyValue) error {
 		if err := e.Encode(kv.key); err != nil {
 			return err
 		}
-		
+
 		if err := e.Encode(kv.value); err != nil {
 			return err
 		}
