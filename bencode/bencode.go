@@ -28,8 +28,8 @@ func (e *Encoder) Encode(v interface{}) error {
 
 	// For byte slices, use byte string
 	if b, ok := v.([]byte); ok {
-		fmt.Fprintf(e.w, "%d:%s", len(b), b)
-		return nil
+		_, err := fmt.Fprintf(e.w, "%d:%s", len(b), b)
+		return err
 	}
 
 	value := reflect.ValueOf(v)
@@ -37,15 +37,15 @@ func (e *Encoder) Encode(v interface{}) error {
 	// Basic types
 	switch value.Type().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		fmt.Fprintf(e.w, "i%de", value.Int())
-		return nil
+		_, err := fmt.Fprintf(e.w, "i%de", value.Int())
+		return err
 	case reflect.Uint, reflect.Uintptr, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		fmt.Fprintf(e.w, "i%de", value.Uint())
-		return nil
+		_, err := fmt.Fprintf(e.w, "i%de", value.Uint())
+		return err
 	case reflect.String:
 		s := value.String()
-		fmt.Fprintf(e.w, "%d:%s", len(s), s)
-		return nil
+		_, err := fmt.Fprintf(e.w, "%d:%s", len(s), s)
+		return err
 	}
 
 	// complex types
