@@ -62,11 +62,20 @@ func (e *Encoder) Encode(v interface{}) error {
 }
 
 func (e *Encoder) encodeSlice(v reflect.Value) error {
-	e.w.Write([]byte{'l'})
-	for i := 0; i < v.Len(); i++ {
-		e.Encode(v.Index(i).Interface())
+	if _, err := e.w.Write([]byte{'l'}); err != nil {
+		return err
 	}
-	e.w.Write([]byte{'e'})
+
+	for i := 0; i < v.Len(); i++ {
+		if err := e.Encode(v.Index(i).Interface()); err != nil {
+			return err
+		}		
+	}
+
+	
+	if _, err := e.w.Write([]byte{'e'}); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -117,14 +126,23 @@ func (e *Encoder) encodeMap(v reflect.Value) error {
 func (e *Encoder) writeDictionary(keyVals []keyValue) error {
 	sort.Sort(keyValueSlice(keyVals))
 
-	e.w.Write([]byte{'d'})
-
-	for _, kv := range keyVals {
-		e.Encode(kv.key)
-		e.Encode(kv.value)
+	if _, err := e.w.Write([]byte{'d'}); err != nil {
+		return err
 	}
 
-	e.w.Write([]byte{'e'})
+	for _, kv := range keyVals {
+		if err := e.Encode(kv.key); err != nil {
+			return err
+		}
+		
+		if err := e.Encode(kv.value); err != nil {
+			return err
+		}
+	}
+
+	if _, err := e.w.Write([]byte{'e'}); err != nil {
+		return err
+	}
 
 	return nil
 }
