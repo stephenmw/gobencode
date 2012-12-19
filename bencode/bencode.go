@@ -2,7 +2,6 @@
 package bencode
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"reflect"
@@ -57,7 +56,7 @@ func (e *Encoder) Encode(v interface{}) error {
 		return e.encodeMap(value)
 	}
 
-	return errors.New(fmt.Sprintf("Unsupported type %T", v))
+	return fmt.Errorf("Unsupported type %T", v)
 }
 
 func (e *Encoder) encodeSlice(v reflect.Value) error {
