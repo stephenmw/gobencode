@@ -48,6 +48,8 @@ func (e *Encoder) Encode(v interface{}) error {
 
 	// complex types
 	switch value.Type().Kind() {
+	case reflect.Ptr:
+		return e.Encode(value.Elem().Interface())
 	case reflect.Slice:
 		return e.encodeSlice(value)
 	case reflect.Struct:

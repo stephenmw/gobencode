@@ -45,6 +45,9 @@ var encTests = []encoderTest{
 	// map dictionaries
 	{map[string]string{"a": "b"}, "d1:a1:be"},
 	{map[string]string{"a": "b", "x": "y", "i": "j"}, "d1:a1:b1:i1:j1:x1:ye"},
+
+	// handle pointers
+	{new(int), "i0e"},
 }
 
 func TestEncoder(t *testing.T) {
